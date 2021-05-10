@@ -1,50 +1,24 @@
-# 7 Construir una aplicación de machine learning
-
-1. [Importar librerías ](#schema1)
-2. [Diseño de página](#schema2)
-3. [Modelo](#schema3)
-4. [Título de la aplicación](#schema4)
-5. [Barra lateral ](#schema5)
-6. [Panel principal](#schema6)
-<hr>
-
-<a name="schema1"></a>
-
-# 1. Importar librerías
-~~~python
 import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.datasets import load_diabetes, load_boston
-~~~
-<hr>
 
-<a name="schema2"></a>
-
-# 2. Diseño de página
-~~~python
+#---------------------------------#
+# Diseño de página
 st.set_page_config(page_title='The Machine Learning App',
     layout='wide')
-~~~
-<hr>
 
-<a name="schema3"></a>
-
-# 3. Modelo
-~~~python
+#---------------------------------#
+# Modelo
 def build_model(df):
     X = df.iloc[:,:-1] # Todas las columnas menos la última para X
     Y = df.iloc[:,-1] # La última para Y
-~~~
-### Division de los datos
-~~~python
-    
+
+    # Division de los datos
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=(100-split_size)/100)
-~~~
-### Mostrar los tamaños de los datos
-~~~python
+    
     st.markdown('**1.2. Data splits**')
     st.write('Training set')
     st.info(X_train.shape)
@@ -56,9 +30,7 @@ def build_model(df):
     st.info(list(X.columns))
     st.write('Y variable')
     st.info(Y.name)
-~~~
-### Crear los parámetros para el modelo
-~~~python
+
     rf = RandomForestRegressor(n_estimators=parameter_n_estimators,
         random_state=parameter_random_state,
         max_features=parameter_max_features,
@@ -71,9 +43,7 @@ def build_model(df):
     rf.fit(X_train, Y_train)
 
     st.subheader('2. Model Performance')
-~~~
-### Mostrar los errores en las predicciones
-~~~python
+
     st.markdown('**2.1. Training set**')
     Y_pred_train = rf.predict(X_train)
     st.write('Coefficient of determination ($R^2$):')
@@ -89,19 +59,12 @@ def build_model(df):
 
     st.write('Error (MSE or MAE):')
     st.info( mean_squared_error(Y_test, Y_pred_test) )
-~~~
-### Mostrar los mejores paŕametros
-~~~Python
+
     st.subheader('3. Model Parameters')
     st.write(rf.get_params())
-~~~
 
-<hr>
-
-<a name="schema4"></a>
-
-# 4. Título de la aplicación
-~~~python
+#---------------------------------#
+# Título de la aplicación
 st.write("""
 # The Machine Learning App
 
@@ -110,24 +73,17 @@ In this implementation, the *RandomForestRegressor()* function is used in this a
 Try adjusting the hyperparameters!
 
 """)
-~~~
-<hr>
 
-<a name="schema5"></a>
+#---------------------------------#
+#Barra lateral - Recopila las características de entrada del usuario en el marco de datos
 
-# 5. Barra lateral 
-### Recopila las características de entrada del usuario en el marco de datos
-~~~python
 with st.sidebar.header('1. Upload your CSV data'):
     uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
     st.sidebar.markdown("""
 [Example CSV input file](https://raw.githubusercontent.com/dataprofessor/data/master/delaney_solubility_with_descriptors.csv)
 """)
-~~~
 
-
-### Parámetros específicos
-~~~python
+# Barra lateral - Parámetros específicos
 with st.sidebar.header('2. Set Parameters'):
     split_size = st.sidebar.slider('Data split ratio (% for Training Set)', 10, 90, 80, 5)
 
@@ -143,16 +99,11 @@ with st.sidebar.subheader('2.2. General Parameters'):
     parameter_bootstrap = st.sidebar.select_slider('Bootstrap samples when building trees (bootstrap)', options=[True, False])
     parameter_oob_score = st.sidebar.select_slider('Whether to use out-of-bag samples to estimate the R^2 on unseen data (oob_score)', options=[False, True])
     parameter_n_jobs = st.sidebar.select_slider('Number of jobs to run in parallel (n_jobs)', options=[1, -1])
-~~~
 
-<hr>
+#---------------------------------#
+# Panel principal
 
-<a name="schema6"></a>
-
-# 6. Panel principal
-
-###  Muestra el conjunto de datos
-~~~python
+# Muestra el conjunto de datos
 st.subheader('1. Dataset')
 
 if uploaded_file is not None:
@@ -182,4 +133,3 @@ else:
         st.write(df.head(5))
 
         build_model(df)
-~~~
